@@ -22,7 +22,7 @@ jobs:
       matrix:
         include:
         - language: java-kotlin
-          build-mode: autobuild # Changed from 'none' to 'autobuild'
+          build-mode: manual # Changed from 'autobuild' to 'manual'
 
     steps:
     - name: Checkout repository
@@ -33,6 +33,13 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+
+    - name: Build code
+      shell: bash
+      run: |
+        # Add the commands to build your project here
+        # Example for a Maven project:
+        ./mvnw clean compile
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
