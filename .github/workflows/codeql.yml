@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: CodeQL
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       matrix:
         include:
         - language: java-kotlin
-          build-mode: manual # Using manual build mode
+          build-mode: manual
 
     steps:
     - name: Checkout repository
@@ -32,22 +32,37 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'adopt' # Options: 'adopt', 'zulu', 'temurin', etc.
-    
+        distribution: 'temurin'
+
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+        queries: +security-extended, +performance, +maintainability, +correctness
 
     - name: Build code
       shell: bash
       run: |
-        # Add the commands to build your project here
-        # Example for a Maven project:
+        # Commands to build your project, Maven example:
         ./mvnw clean compile
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+        output: results.sarif
+
+    - name: Upload CodeQL SARIF results
+      uses: actions/upload-artifact@v3
+      with:
+        name: CodeQL-Results
+        path: results.sarif
