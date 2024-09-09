@@ -47,7 +47,7 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-        queries: security-extended, codeql/java-queries, codeql/suite-queries
+        queries: security-extended # Only using valid built-in query suites
 
     - name: Build code
       shell: bash
